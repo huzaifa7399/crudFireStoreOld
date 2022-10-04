@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Checkout</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <style>
+        /* body { */
+        /* display: flex; */
+        /* justify-content: center;
+            align-items: center;
+            height: 100vh;
+            width: 100vw;
+            margin: 0px; */
+        /* } */
+        .continueShopping {
+            margin-right: 10px;
+            margin-left: 10px;
+        }
+
+        .signOut {
+            margin-left: 100px;
+            margin-right: 10px;
+        }
+    </style>
+</head>
+
+<body class="bg-dark text-light">
+    <!-- <h1 class="text-center pt-3">CART</h1> -->
+
+    <div class="nav justify-content-between pt-3 ">
+        <li class="nav-item buttonOne">
+            <a type="button" class="btn  btn-outline-primary continueShopping"> Continue Shopping</a>
+        </li>
+        <li class="nav-item">
+            <h1 class="text-center ">CHECKOUT</h1>
+        </li>
+        <li class="nav-item">
+            <a type="button" class="btn signOut btn-outline-primary">Signout</a>
+        </li>
+    </div>
+    <div class="myData container-sm text-center pt-5"></div>
+    <div class="container-sm text-center pt-5">
+        <a type="button" class="btn confirmOrder btn-outline-primary">Confirm Order</a>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
+        crossorigin="anonymous"></script>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.10.0/firebase-app.js";
+        import { getFirestore, doc, getDoc, setDoc, collection, addDoc, updateDoc, deleteDoc, deleteField, arrayRemove, FieldValue, arrayUnion } from "https://www.gstatic.com/firebasejs/9.10.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyAz66bT3t2EjwwAuioRp6zw0_onzxFUZ5w",
+            authDomain: "products-de1a7.firebaseapp.com",
+            databaseURL: "https://products-de1a7-default-rtdb.firebaseio.com",
+            projectId: "products-de1a7",
+            storageBucket: "products-de1a7.appspot.com",
+            messagingSenderId: "962045111284",
+            appId: "1:962045111284:web:3e16eaea719ea9c263e7a1"
+        };
+
+        const app = initializeApp(firebaseConfig)
+
+        const db = getFirestore()
+        const id = localStorage.getItem('userID')
+
+        const continueShopping = document.querySelector('.continueShopping')
+        const signOut = document.querySelector('.signOut')
+        const myData = document.querySelector('.myData')
+        const confirmOrder = document.querySelector('.confirmOrder')
+        continueShopping.addEventListener('click', () => {
+            location.replace("http://127.0.0.1:5500/fireBase/signup-login/products.html")
+
+        })
+        signOut.addEventListener('click', () => {
+            location.replace("http://127.0.0.1:5500/fireBase/signup-login/home.html")
+            localStorage.clear()
+        })
+        let mydiv = document.createElement('div')
+        mydiv.innerHTML = ''
+        mydiv.innerHTML += `
+        <h2>Order Number: ${localStorage.getItem('userID')}</h2>
+        <h2 class="pt-3">Total Amount: ${localStorage.getItem('total')}</h2>
+
+        `
+        myData.appendChild(mydiv)
+        confirmOrder.addEventListener('click', () => {
+            alert('Congratulations !!! Your Order is Confirmed ')
+            var myref = doc(db, 'users', id);
+            const mydocref = updateDoc(
+                myref, {
+                cart: deleteField()
+            }).then(() => {
+                localStorage.clear()
+                location.replace("http://127.0.0.1:5500/fireBase/signup-login/home.html")
+
+            })
+        })
+
+
+        const gridDiv = document.querySelector('.myData')
+
+
+
+    </script>
+</body>
+
+</html>

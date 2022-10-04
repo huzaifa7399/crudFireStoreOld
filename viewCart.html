@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cart</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <style>
+        .myData {
+            font-size: larger;
+        }
+
+        tr,
+        td,
+        tbody {
+            width: 100%;
+        }
+
+        .continueShopping {
+            margin-right: 10px;
+            margin-left: 10px;
+        }
+
+        .signOut {
+            margin-left: 100px;
+            margin-right: 10px;
+        }
+    </style>
+</head>
+
+<body class="bg-dark text-light">
+    <div class="nav justify-content-between pt-3 ">
+        <li class="nav-item buttonOne">
+            <a type="button" class="btn  btn-outline-primary continueShopping"> Continue Shopping</a>
+        </li>
+        <li class="nav-item">
+            <h1 class="text-center ">CART</h1>
+        </li>
+        <li class="nav-item">
+            <a type="button" class="btn signOut btn-outline-primary">Signout</a>
+        </li>
+    </div>
+    <div class="container pt-3">
+        <table class="table myTable text-light">
+            <thead>
+                <tr class="text-muted">
+                    <th>NAME</th>
+                    <th>PRICE</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody class="myData "></tbody>
+        </table>
+        <div class="totalAmount"></div>
+        <div class="container text-center pt-3">
+            <button type="button" class="btn btn-outline-primary checkOut">Proceed to Check out</button>
+        </div>
+    </div>
+
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
+        crossorigin="anonymous"></script>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.10.0/firebase-app.js";
+        import { getFirestore, doc, getDoc, setDoc, collection, addDoc, updateDoc, deleteDoc, deleteField, arrayRemove, FieldValue, arrayUnion } from "https://www.gstatic.com/firebasejs/9.10.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyAz66bT3t2EjwwAuioRp6zw0_onzxFUZ5w",
+            authDomain: "products-de1a7.firebaseapp.com",
+            databaseURL: "https://products-de1a7-default-rtdb.firebaseio.com",
+            projectId: "products-de1a7",
+            storageBucket: "products-de1a7.appspot.com",
+            messagingSenderId: "962045111284",
+            appId: "1:962045111284:web:3e16eaea719ea9c263e7a1"
+        };
+
+        const app = initializeApp(firebaseConfig)
+
+        const db = getFirestore()
+
+        const id = localStorage.getItem('userID')
+        // console.log(id)
+        const gridDiv = document.querySelector('.myData')
+        const totalAmount = document.querySelector('.totalAmount')
+        const checkOut = document.querySelector('.checkOut')
+        const continueShopping = document.querySelector('.continueShopping')
+        const signOut = document.querySelector('.signOut')
+        const myTable = document.querySelector('.myTable')
+
+
+        let sum = 0;
+        localStorage.setItem('total', sum)
+
+        async function getAllData() {
+
+            const docRef = doc(db, "users", id);
+            const docSnap = await getDoc(docRef);
+            const myData = docSnap.data();
+            try {
+                myData.cart.forEach((data, idx) => {
+                    const { name, price, id } = data
+                    console.log(data, idx)
+                    let display = document.createElement('tr')
+                    let myNum = parseInt(price)
+                    sum += myNum
+                    display.innerHTML = ''
+                    display.innerHTML += `
+                    <td>${name}</td>
+                    <td>${price}</td>
+                    <td><button class="btn deleteBtn btn-outline-primary" data-name="${name}"  data-price="${price}" data-idx="${idx}">X</button></td>
+                    `
+                    gridDiv.appendChild(display)
+                })
+                let total = document.createElement('div')
+                total.classList.add('pt-4')
+                total.classList.add('text-center')
+
+                total.innerHTML = ''
+                total.innerHTML = `<h1>Total : ${sum} Rs</h1>`
+                totalAmount.appendChild(total)
+                console.log(sum)
+                localStorage.setItem('total', sum)
+            }
+            catch (error) {
+                console.log(error)
+            }
+            document.querySelectorAll('button').forEach(button => {
+                button.onclick = function () {
+                    console.log(myData.cart.pop(this.dataset.idx))
+                    console.log('click', this.dataset.name, this.dataset.price, this.dataset.idx)
+                    console.log(myData.cart)
+                    let myCart = myData.cart
+                    if (myCart.length === 0) {
+                        console.log('mt')
+                        lastObject()
+                    }
+                    else {
+                        myCart.forEach(async data => {
+                            const upadte = await updateDoc(docRef, {
+                                cart: arrayRemove({
+                                    name: this.dataset.name, price: this.dataset.price
+                                })
+                            })
+
+                            window.location.reload(false)
+                        })
+                        // reload()
+                    }
+
+                }
+            })
+        }
+        continueShopping.addEventListener('click', () => {
+            location.replace("http://127.0.0.1:5500/fireBase/signup-login/products.html")
+        })
+        signOut.addEventListener('click', () => {
+            location.replace("http://127.0.0.1:5500/fireBase/signup-login/home.html")
+            localStorage.clear()
+        })
+        checkOut.addEventListener('click', () => {
+            if (parseInt(localStorage.getItem('total')) === 0)
+                alert('No Items in Cart')
+            else
+                location.replace("http://127.0.0.1:5500/fireBase/signup-login/checkOut.html")
+        })
+        function lastObject() {
+
+            var myref = doc(db, 'users', id);
+            const mydocref = updateDoc(
+                myref, {
+                cart: deleteField()
+            }).then(() => {
+                alert('Cart Empty')
+                location.replace("http://127.0.0.1:5500/fireBase/signup-login/products.html")
+            })
+        }
+
+        getAllData()
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>login</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            width: 100vw;
+            margin: 0px;
+        }
+    </style>
+</head>
+
+<body class="bg-dark text-light">
+    <div class="row g-3 align-items-center d-flex justify-content-center">
+        <h1 class="text-center">LOGIN</h1>
+
+        <form class="">
+            <div class="mb-3 row">
+                <label for="userName">USERNAME </label><input type="text" class="form-control"
+                    placeholder="Enter Username" id="userName"><br>
+            </div>
+            <div class="mb-3 row ">
+                <label for="userPw">PASSWORD </label><input type="password" class="form-control"
+                    placeholder="Enter Password" id="userPw"><br>
+            </div>
+            <div class="mb-3">
+                <a type="button" class="btn w-100 btn-outline-primary loginBtn">LOGIN</a>
+            </div>
+        </form>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
+        crossorigin="anonymous"></script>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.10.0/firebase-app.js";
+        import { getFirestore, doc, getDocs, setDoc, collection, addDoc, updateDoc, deleteDoc, deleteField } from "https://www.gstatic.com/firebasejs/9.10.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyAz66bT3t2EjwwAuioRp6zw0_onzxFUZ5w",
+            authDomain: "products-de1a7.firebaseapp.com",
+            databaseURL: "https://products-de1a7-default-rtdb.firebaseio.com",
+            projectId: "products-de1a7",
+            storageBucket: "products-de1a7.appspot.com",
+            messagingSenderId: "962045111284",
+            appId: "1:962045111284:web:3e16eaea719ea9c263e7a1"
+        };
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore()
+        const username = document.querySelector('#userName')
+        const password = document.querySelector('#userPw')
+        const loginBtn = document.querySelector('.loginBtn')
+
+        const authenticateUser = async () => {
+            const ref = collection(db, 'users')
+            const querySnapshot = await getDocs(ref)
+            const data = querySnapshot.docs.map((doc) => ({ ...doc.data(), id: doc.id }))
+            console.log(data[0])
+            data.forEach((datas) => {
+                console.log(datas.password, datas.username)
+                if (password.value && username.value) {
+                    if (datas.username === username.value && datas.password === password.value) {
+                        // alert('user logged in')
+                        location.replace("http://127.0.0.1:5500/fireBase/signup-login/products.html")
+                        localStorage.setItem('userID', datas.id)
+                    }
+                    // else
+                    // alert('invalid username or password')
+                    // }
+                    // else
+                    // alert('username or password is invalid')
+                }
+            })
+        }
+        loginBtn.addEventListener('click', authenticateUser)
+    </script>
+</body>
+
+</html>

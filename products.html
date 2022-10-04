@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Products</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <style>
+        .addProducts {
+            margin-left: 10px;
+        }
+
+        .signOut {
+            margin-right: 10px;
+        }
+
+        h1 {
+            margin-left: 30px;
+        }
+    </style>
+</head>
+
+<body class="bg-dark text-light">
+    <div class="nav justify-content-between pt-3 ">
+        <li class="nav-item ">
+            <a type="button" class="btn  btn-outline-primary addProducts"> Add Products</a>
+        </li>
+        <li class="nav-item">
+            <h1 class="text-center ">PRODUCTS</h1>
+        </li>
+        <li class="nav-item">
+            <a type="button" class="btn  btn-outline-primary viewCart">View Cart</a>
+            <a type="button" class="btn  btn-outline-primary signOut">Sign Out</a>
+        </li>
+    </div>
+    <div class="container ">
+        <div class="myData row row-cols-2 "></div>
+    </div>
+
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
+        crossorigin="anonymous"></script>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.10.0/firebase-app.js";
+        import { getFirestore, doc, getDocs, setDoc, collection, addDoc, updateDoc, deleteDoc, deleteField, getDoc, arrayUnion } from "https://www.gstatic.com/firebasejs/9.10.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyAz66bT3t2EjwwAuioRp6zw0_onzxFUZ5w",
+            authDomain: "products-de1a7.firebaseapp.com",
+            databaseURL: "https://products-de1a7-default-rtdb.firebaseio.com",
+            projectId: "products-de1a7",
+            storageBucket: "products-de1a7.appspot.com",
+            messagingSenderId: "962045111284",
+            appId: "1:962045111284:web:3e16eaea719ea9c263e7a1"
+        };
+
+        const app = initializeApp(firebaseConfig);
+
+        const db = getFirestore()
+
+        const viewCart = document.querySelector('.viewCart')
+        const addProducts = document.querySelector('.addProducts')
+        const gridDiv = document.querySelector('.myData')
+        const signOut = document.querySelector('.signOut')
+        const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+
+        function generateString(length) {
+            let result = ' ';
+            const charactersLength = characters.length;
+            for (let i = 0; i < length; i++) {
+                result += characters.charAt(Math.floor(Math.random() * charactersLength));
+            }
+
+            return result;
+        }
+
+        async function getAllData() {
+            const ref = collection(db, 'products')
+            const querySnapshot = await getDocs(ref)
+            const data = querySnapshot.docs.map((doc) => ({ ...doc.data(), id: doc.id }))
+            console.log(data)
+            data.forEach((datas) => {
+                let myDiv = document.createElement('div')
+                myDiv.classList.add('text-center')
+                myDiv.classList.add('p-5')
+
+                const { name, price, weight, quantity, id } = datas
+                myDiv.innerHTML = ''
+                myDiv.innerHTML += `
+                    
+                        <img src="https://robohash.org/${generateString(3)}.png?set=set4&size=100x100"><br>
+                        <h2> ${name}</h2>
+                        <h5>Rs : ${price}</h5>
+                        <h7 >Weight : ${weight} kg<h7><br>
+                        <button type="button" class="btn btn-outline-primary" data-name="${name}"  data-price="${price}">Add To Cart</button><br>
+                    
+                        `
+                gridDiv.appendChild(myDiv)
+                myDiv.ondblclick = () => {
+                    deleteDoc(doc(db, 'products', id))
+                    myDiv.remove()
+                }
+                document.querySelectorAll('button').forEach(button => {
+                    button.onclick = function () {
+                        const userId = localStorage.getItem('userID')
+                        console.log(userId)
+                        var myref = doc(db, 'users', userId);
+                        console.log(myref)
+                        const mydocref = updateDoc(
+                            myref, {
+                            cart: arrayUnion({ name: this.dataset.name, price: this.dataset.price }),
+                        }).then(() => {
+                            alert('product added to cart')
+
+                        })
+                    }
+                })
+                console.log(datas)
+            })
+        }
+
+        getAllData()
+        viewCart.addEventListener('click', () => {
+            location.replace("http://127.0.0.1:5500/fireBase/signup-login/viewCart.html")
+
+        })
+        addProducts.addEventListener('click', () => {
+            location.replace("http://127.0.0.1:5500/fireBase/signup-login/addProducts.html")
+        })
+        signOut.addEventListener('click', () => {
+            location.replace("http://127.0.0.1:5500/fireBase/signup-login/home.html")
+            localStorage.clear()
+        })
+
+    </script>
+</body>
+
+</html>

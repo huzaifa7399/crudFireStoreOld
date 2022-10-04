@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Products</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <style>
+        .continueShopping {
+            margin-right: 10px;
+            margin-left: 10px;
+        }
+
+        .signOut {
+            margin-left: 100px;
+            margin-right: 10px;
+        }
+    </style>
+</head>
+
+<body class="bg-dark text-light">
+    <div class="nav justify-content-between pt-3 ">
+        <li class="nav-item buttonOne">
+            <a type="button" class="btn  btn-outline-primary continueShopping"> Continue Shopping</a>
+        </li>
+        <li class="nav-item">
+            <h1 class="text-center ">Add Products</h1>
+        </li>
+        <li class="nav-item">
+            <a type="button" class="btn signOut btn-outline-primary">Signout</a>
+        </li>
+    </div>
+    <div class="container justify-content-center pt-5">
+        <form class="">
+            <div class="mb-3 row">
+                <label for="name">Name </label><input type="text" class="form-control" placeholder="Enter Name"
+                    id="name"><br>
+            </div>
+            <div class="mb-3 row">
+                <label for="price">Price </label><input type="text" class="form-control" placeholder="Enter Price"
+                    id="price"><br>
+            </div>
+            <div class="mb-3 row ">
+                <label for="weight">Weight </label><input type="text" class="form-control" placeholder="Enter Weight"
+                    id="weight"><br>
+            </div>
+            <div class="mb-3">
+                <a type="button" class="btn w-100 btn-outline-primary saveBtn">Save</a>
+            </div>
+        </form>
+    </div>
+
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
+        crossorigin="anonymous"></script>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.10.0/firebase-app.js";
+        import { getFirestore, doc, getDoc, setDoc, collection, addDoc, updateDoc, deleteDoc, deleteField } from "https://www.gstatic.com/firebasejs/9.10.0/firebase-firestore.js";
+        const firebaseConfig = {
+            apiKey: "AIzaSyAz66bT3t2EjwwAuioRp6zw0_onzxFUZ5w",
+            authDomain: "products-de1a7.firebaseapp.com",
+            databaseURL: "https://products-de1a7-default-rtdb.firebaseio.com",
+            projectId: "products-de1a7",
+            storageBucket: "products-de1a7.appspot.com",
+            messagingSenderId: "962045111284",
+            appId: "1:962045111284:web:3e16eaea719ea9c263e7a1"
+        };
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore()
+        const name = document.querySelector('#name')
+        const price = document.querySelector('#price')
+        const weight = document.querySelector('#weight')
+        const saveBtn = document.querySelector('.saveBtn')
+        const continueShopping = document.querySelector('.continueShopping')
+        const signOut = document.querySelector('.signOut')
+        async function InsertData() {
+            var ref = collection(db, 'products')
+            const docref = await addDoc(
+                ref, {
+                name: name.value,
+                price: price.value,
+                weight: weight.value,
+            }
+            ).then(() => {
+                alert('product added')
+                location.replace("http://127.0.0.1:5500/fireBase/signup-login/products.html")
+            })
+                .catch((err) => {
+                    alert('error:' + err)
+                })
+        }
+        saveBtn.addEventListener('click', InsertData)
+        continueShopping.addEventListener('click', () => {
+            location.replace("http://127.0.0.1:5500/fireBase/signup-login/products.html")
+
+        })
+        signOut.addEventListener('click', () => {
+            location.replace("http://127.0.0.1:5500/fireBase/signup-login/home.html")
+            localStorage.clear()
+        })
+
+
+    </script>
+</body>
+
+</html>
